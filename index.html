@@ -18,6 +18,7 @@
             --warning: #b45309;
             --warning-light: #fef3c7;
             --border: #e2e8f0;
+            --accent: #2dd4bf;
         }
 
         body {
@@ -36,7 +37,7 @@
 
         header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             padding-bottom: 20px;
             border-bottom: 2px solid var(--border);
         }
@@ -51,6 +52,67 @@
             font-size: 1.1rem;
         }
 
+        /* Simulator Dashboard Styles */
+        .dashboard-card {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f8fafc;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+
+        .dashboard-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-top: 0;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--accent);
+        }
+
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .sim-btn {
+            background: #334155;
+            color: #f8fafc;
+            border: 2px solid transparent;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .sim-btn:hover {
+            background: #475569;
+        }
+
+        .sim-btn.active {
+            background: var(--primary);
+            border-color: var(--accent);
+            box-shadow: 0 0 12px rgba(45, 212, 191, 0.4);
+        }
+
+        .scenario-description {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+            font-size: 0.95rem;
+        }
+
+        /* Grid Layout */
         .grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -73,6 +135,13 @@
             border-radius: 12px;
             padding: 24px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .card.highlighted-risk {
+            border: 2px solid var(--danger);
+            box-shadow: 0 0 15px rgba(185, 28, 28, 0.15);
+            transform: translateY(-2px);
         }
 
         .card-title {
@@ -98,16 +167,17 @@
             padding: 20px;
             border-radius: 8px;
             margin-top: 15px;
-            min-height: 120px;
+            min-height: 100px;
         }
 
         .distribution-box {
             text-align: center;
-            width: 40%;
-            padding: 10px;
+            width: 42%;
+            padding: 12px;
             background: white;
             border-radius: 6px;
             border: 1px dashed var(--text-muted);
+            transition: all 0.3s ease;
         }
 
         .shift-arrow {
@@ -140,6 +210,7 @@
             padding: 12px 20px;
             border-radius: 6px;
             font-weight: 600;
+            transition: all 0.3s ease;
         }
 
         .layer.frozen {
@@ -149,7 +220,7 @@
         }
 
         .layer.frozen::after {
-            content: "❄️ Frozen / Reused";
+            content: "❄️ Frozen Prior Layer";
             font-size: 0.8rem;
             color: #64748b;
         }
@@ -162,7 +233,7 @@
         }
 
         .layer.broken::after {
-            content: "❌ Feature Mismatch Risk";
+            content: "❌ Feature Mismatch Block";
             font-size: 0.8rem;
         }
 
@@ -173,7 +244,7 @@
         }
 
         .layer.trained::after {
-            content: "🔥 Actively Trained";
+            content: "🔥 Updated / Fine-Tuned";
             font-size: 0.8rem;
         }
 
@@ -190,8 +261,14 @@
         }
 
         .math-block span.highlight {
-            color: #2dd4bf;
+            color: var(--accent);
             font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .math-block span.highlight.active-math {
+            color: #ef4444;
+            text-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
         }
 
         @keyframes pulse {
@@ -213,82 +290,41 @@
 <div class="container">
     <header>
         <h1>Feature Reuse & Domain Shift Visualizer</h1>
-        <div class="subtitle">Understanding why transfer learning breaks down under distribution gaps (Slide 9)</div>
+        <div class="subtitle">Interactive Slide 9 Production Machine Learning Demonstrator</div>
     </header>
 
-    <div class="grid">
-        <div class="card">
-            <h3 class="card-title"><i class="fa-solid fa-chart-area"></i> 1. Covariate Shift</h3>
-            <p><strong>Mathematical Form:</strong> P<sub>S</sub>(X) ≠ P<sub>T</sub>(X)</p>
-            <p>The input data distribution changes while the underlying concept stays the same. The frozen filters ($f_\theta$) encounter feature boundaries they weren't optimized to see.</p>
-            
-            <div class="shift-visualizer">
-                <div class="distribution-box">
-                    <span style="color: var(--primary); font-weight: bold;">Source (P<sub>S</sub>)</span><br>
-                    <small>High-Res Natural Images</small>
-                </div>
-                <div class="shift-arrow">
-                    ≠
-                    <span class="shift-label">Shift</span>
-                </div>
-                <div class="distribution-box">
-                    <span style="color: var(--danger); font-weight: bold;">Target (P<sub>T</sub>)</span><br>
-                    <small>Low-Contrast X-Rays</small>
-                </div>
-            </div>
+    <div class="dashboard-card">
+        <div class="dashboard-title"><i class="fa-solid fa-flask"></i> Interactive Scenario Simulator</div>
+        <p style="margin-top: 0; color: #cbd5e1;">Select a real-world engine failure mode to observe how domain changes disrupt the feature extraction pipeline:</p>
+        
+        <div class="btn-group">
+            <button class="sim-btn active" onclick="runSimulation('baseline')">
+                <i class="fa-solid fa-circle-check"></i> Baseline State
+            </button>
+            <button class="sim-btn" onclick="runSimulation('medical')">
+                <i class="fa-solid fa-notes-medical"></i> Medical Diagnostics
+            </button>
+            <button class="sim-btn" onclick="runSimulation('driving')">
+                <i class="fa-solid fa-car-burst"></i> Autonomous Monsoons
+            </button>
+            <button class="sim-btn" onclick="runSimulation('ecommerce')">
+                <i class="fa-solid fa-store-slash"></i> E-Commerce Defect
+            </button>
         </div>
 
-        <div class="card">
-            <h3 class="card-title risk"><i class="fa-solid fa-shuffle"></i> 2. Concept Shift (Highly Dangerous)</h3>
-            <p><strong>Mathematical Form:</strong> P<sub>S</sub>(Y|X) ≠ P<sub>T</sub>(Y|X)</p>
-            <p>The actual real-world meaning of the features has changed. Reusing a frozen backbone forces the network to map old assumptions to contradictory new labels.</p>
-            
-            <div class="shift-visualizer">
-                <div class="distribution-box">
-                    <span style="color: var(--primary); font-weight: bold;">X → "Car"</span><br>
-                    <small>Source Task Context</small>
-                </div>
-                <div class="shift-arrow">
-                    ⚠️
-                    <span class="shift-label">Conflict</span>
-                </div>
-                <div class="distribution-box">
-                    <span style="color: var(--danger); font-weight: bold;">X → "Anomaly"</span><br>
-                    <small>Target Task Context</small>
-                </div>
-            </div>
-        </div>
-
-        <div class="card full-width">
-            <h3 class="card-title warning"><i class="fa-solid fa-network-wired"></i> Impact on the Network Architecture</h3>
-            <p>When the <strong>Domain Divergence</strong> is broad, early layers struggle to output clean representations, forcing errors into downstream layers.</p>
-            
-            <div class="network-flow">
-                <div class="layer trained">Input Data Space (x)</div>
-                <div class="layer frozen">Early Layers (conv1 / conv2) - Generic edges & textures</div>
-                <div class="layer broken">Deep Extractor Layers (conv4 / conv5) - Highly specialized representations</div>
-                <div class="layer trained">Classification Head (g<sub>φ</sub>) - Task-specific output</div>
-            </div>
-        </div>
-
-        <div class="card full-width">
-            <h3 class="card-title risk"><i class="fa-solid fa-calculator"></i> The Domain Adaptation Generalization Bound</h3>
-            <p>The error on your target task ($\varepsilon<sub>T</sub>$) is fundamentally restricted by the statistical divergence between your source and target domains:</p>
-            
-            <div class="math-block">
-                &epsilon;<sub>T</sub>(h) &le; &epsilon;<sub>S</sub>(h) + <span class="highlight">&frac12; d<sub>H&Delta;H</sub>(D<sub>S</sub>, D<sub>T</sub>)</span> + &lambda;*
-            </div>
-            
-            <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem;">
-                As the highlighted <span style="color: var(--primary); font-weight: bold;">Domain Divergence (Gap)</span> expands, the target error bound explodes, causing <strong>Negative Transfer</strong>.
-            </p>
+        <div class="scenario-description" id="scenario-text">
+            <strong>Baseline State:</strong> Reusing a standard backbone under minor variations. The feature space maps closely, and target generalization error stays securely bounded.
         </div>
     </div>
 
-    <footer>
-        <p>Interactive Slide 9 Supplement • Designed for Deep Learning Systems Architecture Review</p>
-    </footer>
-</div>
-
-</body>
-</html>
+    <div class="grid">
+        <div class="card" id="card-covariate">
+            <h3 class="card-title" id="title-covariate"><i class="fa-solid fa-chart-area"></i> 1. Covariate Shift</h3>
+            <p><strong>Mathematical Form:</strong> P<sub>S</sub>(X) ≠ P<sub>T</sub>(X)</p>
+            <p>Input data distribution shifts drastically, but the conditional meaning matches. Raw edge statistics hit completely unoptimized extraction basins.</p>
+            
+            <div class="shift-visualizer">
+                <div class="distribution-box" id="box-cov-src">
+                    <span style="color: var(--primary); font-weight: bold;">Source P<sub>S</sub>(X)</span><br>
+                    <small id="text-cov-src">Standard Inputs</small>
+                </div>
