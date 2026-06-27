@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizing Distribution Shifts & Feature Reuse Risks</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --primary: #0f766e;
+            --primary-light: #ccfbf1;
+            --danger: #b91c1c;
+            --danger-light: #fee2e2;
+            --warning: #b45309;
+            --warning-light: #fef3c7;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        @media (min-width: 768px) {
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .full-width {
+                grid-column: span 2;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .card-title.risk { color: var(--danger); }
+        .card-title.warning { color: var(--warning); }
+
+        /* Distribution Shift Visualizer Styles */
+        .shift-visualizer {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: #f1f5f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+            min-height: 120px;
+        }
+
+        .distribution-box {
+            text-align: center;
+            width: 40%;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            border: 1px dashed var(--text-muted);
+        }
+
+        .shift-arrow {
+            font-size: 1.5rem;
+            color: var(--danger);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .shift-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Feature Reuse Architecture Graphic */
+        .network-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .layer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .layer.frozen {
+            background-color: #e2e8f0;
+            border: 1px solid #cbd5e1;
+            color: #475569;
+        }
+
+        .layer.frozen::after {
+            content: "❄️ Frozen / Reused";
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        .layer.broken {
+            background-color: var(--danger-light);
+            border: 1px solid #fca5a5;
+            color: var(--danger);
+            animation: pulse 2s infinite;
+        }
+
+        .layer.broken::after {
+            content: "❌ Feature Mismatch Risk";
+            font-size: 0.8rem;
+        }
+
+        .layer.trained {
+            background-color: var(--primary-light);
+            border: 1px solid #99f6e4;
+            color: var(--primary);
+        }
+
+        .layer.trained::after {
+            content: "🔥 Actively Trained";
+            font-size: 0.8rem;
+        }
+
+        .math-block {
+            background: #0f172a;
+            color: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 1.1rem;
+            text-align: center;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+
+        .math-block span.highlight {
+            color: #2dd4bf;
+            font-weight: bold;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Feature Reuse & Domain Shift Visualizer</h1>
+        <div class="subtitle">Understanding why transfer learning breaks down under distribution gaps (Slide 9)</div>
+    </header>
+
+    <div class="grid">
+        <div class="card">
+            <h3 class="card-title"><i class="fa-solid fa-chart-area"></i> 1. Covariate Shift</h3>
+            <p><strong>Mathematical Form:</strong> P<sub>S</sub>(X) ≠ P<sub>T</sub>(X)</p>
+            <p>The input data distribution changes while the underlying concept stays the same. The frozen filters ($f_\theta$) encounter feature boundaries they weren't optimized to see.</p>
+            
+            <div class="shift-visualizer">
+                <div class="distribution-box">
+                    <span style="color: var(--primary); font-weight: bold;">Source (P<sub>S</sub>)</span><br>
+                    <small>High-Res Natural Images</small>
+                </div>
+                <div class="shift-arrow">
+                    ≠
+                    <span class="shift-label">Shift</span>
+                </div>
+                <div class="distribution-box">
+                    <span style="color: var(--danger); font-weight: bold;">Target (P<sub>T</sub>)</span><br>
+                    <small>Low-Contrast X-Rays</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 class="card-title risk"><i class="fa-solid fa-shuffle"></i> 2. Concept Shift (Highly Dangerous)</h3>
+            <p><strong>Mathematical Form:</strong> P<sub>S</sub>(Y|X) ≠ P<sub>T</sub>(Y|X)</p>
+            <p>The actual real-world meaning of the features has changed. Reusing a frozen backbone forces the network to map old assumptions to contradictory new labels.</p>
+            
+            <div class="shift-visualizer">
+                <div class="distribution-box">
+                    <span style="color: var(--primary); font-weight: bold;">X → "Car"</span><br>
+                    <small>Source Task Context</small>
+                </div>
+                <div class="shift-arrow">
+                    ⚠️
+                    <span class="shift-label">Conflict</span>
+                </div>
+                <div class="distribution-box">
+                    <span style="color: var(--danger); font-weight: bold;">X → "Anomaly"</span><br>
+                    <small>Target Task Context</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="card full-width">
+            <h3 class="card-title warning"><i class="fa-solid fa-network-wired"></i> Impact on the Network Architecture</h3>
+            <p>When the <strong>Domain Divergence</strong> is broad, early layers struggle to output clean representations, forcing errors into downstream layers.</p>
+            
+            <div class="network-flow">
+                <div class="layer trained">Input Data Space (x)</div>
+                <div class="layer frozen">Early Layers (conv1 / conv2) - Generic edges & textures</div>
+                <div class="layer broken">Deep Extractor Layers (conv4 / conv5) - Highly specialized representations</div>
+                <div class="layer trained">Classification Head (g<sub>φ</sub>) - Task-specific output</div>
+            </div>
+        </div>
+
+        <div class="card full-width">
+            <h3 class="card-title risk"><i class="fa-solid fa-calculator"></i> The Domain Adaptation Generalization Bound</h3>
+            <p>The error on your target task ($\varepsilon<sub>T</sub>$) is fundamentally restricted by the statistical divergence between your source and target domains:</p>
+            
+            <div class="math-block">
+                &epsilon;<sub>T</sub>(h) &le; &epsilon;<sub>S</sub>(h) + <span class="highlight">&frac12; d<sub>H&Delta;H</sub>(D<sub>S</sub>, D<sub>T</sub>)</span> + &lambda;*
+            </div>
+            
+            <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem;">
+                As the highlighted <span style="color: var(--primary); font-weight: bold;">Domain Divergence (Gap)</span> expands, the target error bound explodes, causing <strong>Negative Transfer</strong>.
+            </p>
+        </div>
+    </div>
+
+    <footer>
+        <p>Interactive Slide 9 Supplement • Designed for Deep Learning Systems Architecture Review</p>
+    </footer>
+</div>
+
+</body>
+</html>
