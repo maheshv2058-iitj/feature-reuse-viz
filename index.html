@@ -328,3 +328,159 @@
                     <span style="color: var(--primary); font-weight: bold;">Source P<sub>S</sub>(X)</span><br>
                     <small id="text-cov-src">Standard Inputs</small>
                 </div>
+                <div class="shift-arrow">
+                    ≠
+                    <span class="shift-label">Shift</span>
+                </div>
+                <div class="distribution-box" id="box-cov-tgt">
+                    <span style="color: var(--text-main); font-weight: bold;">Target P<sub>T</sub>(X)</span><br>
+                    <small id="text-cov-tgt">Standard Target</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="card-concept">
+            <h3 class="card-title" id="title-concept"><i class="fa-solid fa-shuffle"></i> 2. Concept Shift</h3>
+            <p><strong>Mathematical Form:</strong> P<sub>S</sub>(Y|X) ≠ P<sub>T</sub>(Y|X)</p>
+            <p>Highly dangerous. The real-world operational context updates entirely. A frozen feature tensor forces assumptions onto a contradictory label landscape.</p>
+            
+            <div class="shift-visualizer">
+                <div class="distribution-box" id="box-con-src">
+                    <span style="color: var(--primary); font-weight: bold;">Context A</span><br>
+                    <small id="text-con-src">Source Mapping</small>
+                </div>
+                <div class="shift-arrow">
+                    ⚠️
+                    <span class="shift-label">Conflict</span>
+                </div>
+                <div class="distribution-box" id="box-con-tgt">
+                    <span style="color: var(--text-main); font-weight: bold;">Context B</span><br>
+                    <small id="text-con-tgt">Target Mapping</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="card full-width">
+            <h3 class="card-title warning"><i class="fa-solid fa-network-wired"></i> Architecture Adaptation Strategy</h3>
+            <p id="architecture-strategy-text">Under ideal conditions, early universal filters are completely frozen to preserve general vision baselines.</p>
+            
+            <div class="network-flow" id="network-pipeline">
+                <div class="layer trained" id="layer-input">Input Layer (x)</div>
+                <div class="layer frozen" id="layer-early">Early Layers (conv1 / conv2) - Basic Gabor Edges</div>
+                <div class="layer frozen" id="layer-deep">Deep Layers (conv4 / conv5) - High-level Semantics</div>
+                <div class="layer trained" id="layer-head">Classification Head (g<sub>φ</sub>)</div>
+            </div>
+        </div>
+
+        <div class="card full-width" id="card-math">
+            <h3 class="card-title risk"><i class="fa-solid fa-calculator"></i> Generalization Bound Constraint</h3>
+            <p>The target tracking error is fundamentally constrained by structural domain divergence:</p>
+            
+            <div class="math-block">
+                &epsilon;<sub>T</sub>(h) &le; &epsilon;<sub>S</sub>(h) + <span class="highlight" id="math-gap">&frac12; d<sub>H&Delta;H</sub>(D<sub>S</sub>, D<sub>T</sub>)</span> + &lambda;*
+            </div>
+            
+            <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem;" id="math-explanation">
+                When the domains remain close, the bound is stable, enabling robust feature reuse.
+            </p>
+        </div>
+    </div>
+
+    <footer>
+        <p>Production Framework Simulation Dashboard • Deep Learning Architecture</p>
+    </footer>
+</div>
+
+<script>
+    function runSimulation(type) {
+        // Reset button active classes
+        document.querySelectorAll('.sim-btn').forEach(btn => btn.classList.remove('active'));
+        // Reset highlights
+        document.getElementById('card-covariate').classList.remove('highlighted-risk');
+        document.getElementById('card-concept').classList.remove('highlighted-risk');
+        document.getElementById('title-covariate').className = "card-title";
+        document.getElementById('title-concept').className = "card-title";
+        document.getElementById('math-gap').classList.remove('active-math');
+        
+        // Reset pipeline classes to baseline
+        const early = document.getElementById('layer-early');
+        const deep = document.getElementById('layer-deep');
+        const head = document.getElementById('layer-head');
+        early.className = "layer frozen";
+        deep.className = "layer frozen";
+        head.className = "layer trained";
+
+        // Get elements to change
+        const text = document.getElementById('scenario-text');
+        const covSrc = document.getElementById('text-cov-src');
+        const covTgt = document.getElementById('text-cov-tgt');
+        const conSrc = document.getElementById('text-con-src');
+        const conTgt = document.getElementById('text-con-tgt');
+        const archText = document.getElementById('architecture-strategy-text');
+        const mathText = document.getElementById('math-explanation');
+
+        // Target active button styling
+        event.currentTarget.classList.add('active');
+
+        if (type === 'baseline') {
+            text.innerHTML = "<strong>Baseline State:</strong> Reusing a standard backbone under minor variations. The feature space maps closely, and target generalization error stays securely bounded.";
+            covSrc.innerText = "Natural Objects";
+            covTgt.innerText = "Similar Categories";
+            conSrc.innerText = "Shape → Animal";
+            conTgt.innerText = "Shape → Animal";
+            archText.innerText = "Under ideal conditions, early universal filters are completely frozen to preserve general vision baselines.";
+            mathText.innerHTML = "When the domains remain close, the bound is stable, enabling robust feature reuse.";
+        } 
+        else if (type === 'medical') {
+            text.innerHTML = "<strong>Medical Diagnostics Case:</strong> ImageNet models encounter <strong>Covariate Shift</strong> when processing Chest X-Rays. The input statistics change completely from vibrant color palettes to transparent bone/tissue shapes.";
+            covSrc.innerText = "Vibrant ImageNet Photos";
+            covTgt.innerText = "Monochromatic X-Rays";
+            conSrc.innerText = "Texture → Dog Fur";
+            conTgt.innerText = "Texture → Dog Fur";
+            
+            // Highlight Covariate card and Math Gap
+            document.getElementById('card-covariate').classList.add('highlighted-risk');
+            document.getElementById('title-covariate').className = "card-title risk";
+            document.getElementById('math-gap').classList.add('active-math');
+            
+            // Update Architecture Strategy (Partial Fine Tuning Type 5.3)
+            archText.innerHTML = "<strong>Fix Applied: Partial Fine-Tuning (Type 5.3).</strong> We freeze early baseline filters (`conv1-2`) but <strong>unfreeze deep layers (`conv4-5`)</strong> to allow the network to learn to interpret human tissue density metrics.";
+            deep.className = "layer trained";
+            mathText.innerHTML = "<strong>Exploding Domain Divergence:</strong> The input discrepancy forces the middle bound factor to surge. Freezing everything completely would lead to severe feature representation failure.";
+        } 
+        else if (type === 'driving') {
+            text.innerHTML = "<strong>Autonomous Monsoon Case:</strong> A navigation engine optimized for Arizona streets hits <strong>Concept Shift</strong> in monsoon environments. Solid concrete structures parallel to the vehicle mean safety boundaries in one location, but signal flash floods or lane splits in another.";
+            covSrc.innerText = "Clear Highway Frames";
+            covTgt.innerText = "Heavy Monsoon Rain";
+            conSrc.innerText = "Barrier → Safe Edge";
+            conTgt.innerText = "Barrier → Severe Hazard";
+            
+            // Highlight Concept Shift card and Math
+            document.getElementById('card-concept').classList.add('highlighted-risk');
+            document.getElementById('title-concept').className = "card-title risk";
+            document.getElementById('math-gap').classList.add('active-math');
+            
+            // Update Architecture Strategy (Full Fine Tuning Type 5.2)
+            archText.innerHTML = "<strong>Fix Applied: Full Fine-Tuning / Gradual Unfreezing (Type 5.2 / 5.4).</strong> Because the safety criteria have structurally changed, keeping layers frozen creates <strong>Negative Transfer</strong>. We must let the entire backbone adapt under careful learning rates.";
+            early.className = "layer trained";
+            deep.className = "layer trained";
+            mathText.innerHTML = "<strong>Dangerous Concept Shift:</strong> The structural task mapping is broken, introducing major layout lock-in risks. Safe bounds cannot be established unless weights coordinate.";
+        } 
+        else if (type === 'ecommerce') {
+            text.innerHTML = "<strong>E-Commerce Defect Outage:</strong> A sentiment model shifts from balanced reviews into a production window where an emergency hardware failure causes 95% of customer text batches to arrive highly critical (Label/Prior Shift).";
+            covSrc.innerText = "Standard Balanced Queries";
+            covTgt.innerText = "Lopsided Error Subsets";
+            conSrc.innerText = "Text Context → Balanced";
+            conTgt.innerText = "Text Context → Heavily Biased";
+            
+            // Update Architecture Strategy (Parameter Efficient Adaption Type 5.6)
+            archText.innerHTML = "<strong>Fix Applied: Parameter-Efficient LoRA Adapters (Type 5.6).</strong> The core language model backbone stays frozen to prevent catastrophic forgetting. We insert a compact low-rank trainable weight update to track the critical batch anomalies.";
+            deep.className = "layer frozen";
+            deep.setAttribute("style", "border: 2px dashed var(--accent);");
+            mathText.innerHTML = "<strong>Prior Shift Adjustments:</strong> Rather than updating massive deep layers, parameter-efficient adapters balance the structural distribution offset without damaging baseline text understanding.";
+        }
+    }
+</script>
+
+</body>
+</html>
