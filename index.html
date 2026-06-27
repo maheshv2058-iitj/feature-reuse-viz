@@ -173,15 +173,38 @@
         .flow-header.src { background: var(--primary-light); color: var(--primary); }
         .flow-header.tgt { background: var(--danger-light); color: var(--danger); }
 
-        .data-stream-box {
-            background: #f1f5f9;
+        /* Enhanced Concrete Example Box Construction */
+        .data-example-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
             border-radius: 8px;
             padding: 12px;
-            text-align: center;
-            margin-bottom: 10px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            border-left: 4px solid #94a3b8;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .data-example-card.target-style {
+            border-left-color: var(--danger);
+        }
+
+        .example-tag {
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .example-value {
+            font-family: monospace;
+            background: #ffffff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+            display: block;
+            margin-top: 2px;
+            color: #0f172a;
         }
 
         /* Dynamic Network Pipeline Graph */
@@ -259,6 +282,17 @@
             font-size: 0.95rem;
         }
 
+        /* Failure Mechanism Explainer Walkthrough Box */
+        .mechanism-explainer {
+            background: #fffbeb;
+            border: 1px solid #fef3c7;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #92400e;
+        }
+
         footer {
             text-align: center;
             margin-top: 40px;
@@ -303,17 +337,35 @@
             
             <div class="split-flow-container">
                 <div class="flow-column">
-                    <div class="flow-header src">Source Context (P<sub>S</sub>)</div>
-                    <div class="data-stream-box" id="src-box-1"></div>
-                    <div class="data-stream-box" id="src-box-2"></div>
+                    <div class="flow-header src">Source Task Sample (P<sub>S</sub>)</div>
+                    
+                    <div class="data-example-card">
+                        <div class="example-tag">Input Data Vector (X)</div>
+                        <span class="example-value" id="src-val-x"></span>
+                    </div>
+                    
+                    <div class="data-example-card">
+                        <div class="example-tag">True Target Label (Y)</div>
+                        <span class="example-value" id="src-val-y"></span>
+                    </div>
                 </div>
                 
                 <div class="flow-column">
-                    <div class="flow-header tgt">Target Context (P<sub>T</sub>)</div>
-                    <div class="data-stream-box" id="tgt-box-1" style="border-left-color: var(--danger);"></div>
-                    <div class="data-stream-box" id="tgt-box-2" style="border-left-color: var(--danger);"></div>
+                    <div class="flow-header tgt">Target Task Sample (P<sub>T</sub>)</div>
+                    
+                    <div class="data-example-card target-style">
+                        <div class="example-tag">Input Data Vector (X)</div>
+                        <span class="example-value" id="tgt-val-x"></span>
+                    </div>
+                    
+                    <div class="data-example-card target-style">
+                        <div class="example-tag">True Target Label (Y)</div>
+                        <span class="example-value" id="tgt-val-y"></span>
+                    </div>
                 </div>
             </div>
+
+            <div class="mechanism-explainer" id="mechanism-text"></div>
         </div>
 
         <div class="card">
@@ -346,58 +398,62 @@
 </div>
 
 <script>
-    // Configuration mappings for each state machine node
+    // Configuration mappings containing concrete, step-by-step mathematical inputs & examples
     const modes = {
         covariate: {
-            title: "Covariate Shift Visualization [ P<sub>S</sub>(X) ≠ P<sub>T</sub>(X) ]",
-            desc: "Input feature distributions alter radically, while underlying structural concepts remain persistent. Pretrained edge matrices crash into unexpected boundaries.",
-            src1: "🎨 Vibrant Natural RGB Data",
-            src2: "📐 Sharp Depth-of-Field Focus",
-            tgt1: "💀 Monochromatic Gray X-Rays",
-            tgt2: "🌫️ Translucent Low-Contrast Tissue",
+            title: "Covariate Shift [ P<sub>S</sub>(X) ≠ P<sub>T</sub>(X) ]",
+            desc: "Input feature distributions shift completely, but the basic target classification logic stays identical. Pretrained low-level visual filters face data fields they are completely uncalibrated to read.",
+            srcX: "📸 ImageNet: High-resolution RGB pixel matrices (vibrant colors, sharp edge boundaries of everyday objects).",
+            srcY: "🏷️ Class: 'Pneumonia / Lung Infiltration' (Not present, or completely balanced baseline classification distributions).",
+            tgtX: "🩻 Chest X-Ray: Grayscale, highly translucent, low-contrast tissue densities with high noise parameters.",
+            tgtY: "🏷️ Class: 'Pneumonia / Lung Infiltration' (The conceptual definition of what structural lung disease looks like remains consistent).",
             earlyClass: "layer pipeline-node node-frozen",
             deepClass: "layer pipeline-node node-danger",
             headClass: "layer pipeline-node node-trained",
             mathAlert: false,
-            banner: "<strong>Partial Fine-Tuning (Type 5.3) Optimization:</strong> Keep baseline edge representations (`conv1-2`) completely frozen. Unfreeze task-specific upper blocks (`conv4-5`) to absorb the data scale shifts without exploding evaluation variance."
+            mechanism: "<strong>⚠️ Extraction Failure Loop:</strong> The frozen extractor ($f_\\theta$) searches for vibrant color edges and clear contrast depths. Because the X-ray inputs are grayscale and low-contrast, early feature map activations output heavy background noise. This prevents downstream semantic classification layers from generating clear activation vectors.",
+            banner: "<strong>Partial Fine-Tuning (Type 5.3) Optimization:</strong> Keep baseline edge representations (`conv1-2`) completely frozen to preserve general pixel patterns. Unfreeze task-specific upper blocks (`conv4-5`) to let the weights adapt to the specific textures of tissue density."
         },
         prior: {
-            title: "Label / Prior Shift Visualization [ P<sub>S</sub>(Y) ≠ P<sub>T</sub>(Y) ]",
-            desc: "The category output distribution changes drastically. Extractors retain spatial understanding, but decision margins are distorted by lopsided distributions.",
-            src1: "⚖️ Balanced Sentiment Balance (50/50)",
-            src2: "📊 Uniform Class Prior Array",
-            tgt1: "🚨 Anomaly Outage: 95% Negative Reviews",
-            tgt2: "📉 Heavily Skewed Target Array",
+            title: "Label / Prior Shift [ P<sub>S</sub>(Y) ≠ P<sub>T</sub>(Y) ]",
+            desc: "The probability distribution of output categories changes radically between environments. The feature extractor functions accurately, but the classification boundary becomes skewed.",
+            srcX: "💬 Customer Review Corpus Text: 'The product arrived on time and functions as described.'",
+            srcY: "📊 Distribution: Balanced Review Sentiment [ P(Positive)=0.50 / P(Negative)=0.50 ]",
+            tgtX: "💬 Customer Review Corpus Text: 'The product arrived on time but completely melted on first use.'",
+            tgtY: "🚨 Outage Skew: Critical Mass Batch Defect [ P(Positive)=0.05 / P(Negative)=0.95 ]",
             earlyClass: "layer pipeline-node node-frozen",
             deepClass: "layer pipeline-node node-frozen",
             headClass: "layer pipeline-node node-danger",
             mathAlert: false,
+            mechanism: "<strong>⚠️ Boundary Mismatch Loop:</strong> The language model backbone ($f_\\theta$) maps the structural syntax of sentences flawlessly. However, because the target environment is flooded with an overwhelming surge of negative defect complaints, the standard classification head ($g_\\phi$) relies too heavily on its balanced source assumptions, leading it to misread sarcastic or complex criticisms.",
             banner: "<strong>Parameter-Efficient LoRA (Type 5.6) Optimization:</strong> Lock the core feature backbone completely to preserve structural stability. Apply compact low-rank trainable adaptation matrices directly inside the output layer configuration to offset category drift."
         },
         concept: {
-            title: "Concept Shift Visualization [ P<sub>S</sub>(Y|X) ≠ P<sub>T</sub>(Y|X) ]",
-            desc: "Highly Dangerous. The mapping context shifts entirely. Reusing a static extractor forces old semantic associations onto contradictory real-world definitions.",
-            src1: "🛣️ Solid White Line → Safe Boundary",
-            src2: "☀️ Predictable Clear Weather Vision",
-            tgt1: "🌊 Solid White Line → Flood Barricade",
-            tgt2: "🌧️ Severe Monsoon Road Layouts",
+            title: "Concept Shift [ P<sub>S</sub>(Y|X) ≠ P<sub>T</sub>(Y|X) ]",
+            desc: "Highly Dangerous. The underlying physical meaning of identical feature patterns alters completely. Reusing a static extractor forces old assumptions onto contradictory new target realities.",
+            srcX: "🛣️ Visual Matrix: Long, solid white parallel concrete structure running next to the vehicle.",
+            srcY: "🎯 Prediction Concept: 'Safe Road Boundary / Guardrail' (100% confidence to continue acceleration).",
+            tgtX: "🛣️ Visual Matrix: Long, solid white parallel concrete structure running next to the vehicle.",
+            tgtY: "🌊 Prediction Concept: 'Temporary Monsoon Flood Barricade / Construction Split' (Requires immediate braking).",
             earlyClass: "layer pipeline-node node-frozen",
             deepClass: "layer pipeline-node node-danger",
             headClass: "layer pipeline-node node-danger",
             mathAlert: true,
+            mechanism: "<strong>⚠️ Fatal Execution Loop:</strong> The feature extractor ($f_\\theta$) accurately identifies the shape vector and outputs a signature indicating a solid boundary wall. Because this is frozen, it passes this representation forward. The classification head relies on the old source context, causing the autonomous vehicle to accelerate forward into a dynamic construction hazard.",
             banner: "<strong>Full Fine-Tuning (Type 5.2) Optimization:</strong> Avoid freezing deep features. The mismatch in conditional context causes <strong>Negative Transfer</strong>. Use gradual unfreezing with high weight regularization to rebuild feature definitions safely."
         },
         gap: {
-            title: "Large Domain Gap Risk [ Divergence Bound Explosion ]",
-            desc: "When source task properties diverge completely from the target task, the underlying inductive features become mathematically useless.",
-            src1: "🚗 ImageNet: Consumer Vehicles & Objects",
-            src2: "🌍 Earth Observation / Urban Textures",
-            tgt1: "🔬 Synthetic Aperture Radar (SAR) Echoes",
-            tgt2: "🛰️ Multi-Spectral Sub-Surface Mappings",
+            title: "Large Domain Gap [ Generalization Bound Explosion ]",
+            desc: "The source domain shares zero meaningful data geometry or category commonalities with the target task, causing the underlying feature mappings to break down entirely.",
+            srcX: "🚗 ImageNet Database: Camera photography of daily life (vehicles, domestic animals, consumer goods).",
+            srcY: "🏷️ Label Mapping: 1,000 Everyday Object Class Categories.",
+            tgtX: "📡 Advanced Radar Echoes: Synthetic Aperture Radar (SAR) raw multi-spectral sub-surface soil reflections.",
+            tgtY: "🏷️ Label Mapping: Sub-surface geological composition metrics.",
             earlyClass: "layer pipeline-node node-danger",
             deepClass: "layer pipeline-node node-danger",
             headClass: "layer pipeline-node node-danger",
             mathAlert: true,
+            mechanism: "<strong>⚠️ Complete Bound Explosion Loop:</strong> The mathematical distance between the data properties is too wide. The universal vision priors learned from photographic images have no spatial or physical relevance to raw radar reflections, causing the domain divergence bound to explode.",
             banner: "<strong>Training From Scratch Required:</strong> When the structural domain gap expands too far, the entire mathematical boundary constraint drops. Reusing frozen features acts as a negative bias. Discard the pretrained initialization and train from scratch."
         }
     };
@@ -409,13 +465,16 @@
 
         const config = modes[modeKey];
 
-        // Apply Text Updates
+        // Apply Text and Concrete Example Updates
         document.getElementById('dynamic-flow-title').innerHTML = `<i class="fa-solid fa-right-left"></i> ${config.title}`;
         document.getElementById('dynamic-flow-desc').innerHTML = config.desc;
-        document.getElementById('src-box-1').innerText = config.src1;
-        document.getElementById('src-box-2').innerText = config.src2;
-        document.getElementById('tgt-box-1').innerText = config.tgt1;
-        document.getElementById('tgt-box-2').innerText = config.tgt2;
+        
+        document.getElementById('src-val-x').innerText = config.srcX;
+        document.getElementById('src-val-y').innerText = config.srcY;
+        document.getElementById('tgt-val-x').innerText = config.tgtX;
+        document.getElementById('tgt-val-y').innerText = config.tgtY;
+        
+        document.getElementById('mechanism-text').innerHTML = config.mechanism;
         document.getElementById('summary-banner-text').innerHTML = config.banner;
 
         // Apply Neural Network Pipeline Node Refreshes
